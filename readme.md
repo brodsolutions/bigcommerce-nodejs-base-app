@@ -1,4 +1,4 @@
-# Bigcommerce for Node.js
+# Bigcommerce Base App (Node.js, Express, HBS)
 A node module for authentication and use with the BigCommerce API
 ## Installation
 
@@ -29,9 +29,9 @@ Callback URLs:
 
 Copy the .env-sample to .env
 
-Replace the Client_ID & Client_Secret based on the App created from 
+Replace the Client_ID & Client_Secret from your newly created BigCommerce App by clicking "view Client ID". 
 
-Set the Callback_URL to the ngrok url and append /auth
+Set the Callback_URL to {url}/auth .
 
 ## Routes
 
