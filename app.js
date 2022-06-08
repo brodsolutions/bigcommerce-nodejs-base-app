@@ -1,8 +1,4 @@
-const express = require('express')
-const app = express()
-var fs = require('fs')
-const https = require('https')
-
+const express = require('express'), app = express(), fs = require('fs'), https = require('https');
 // Files for Requests
 var index = require('./routes/index')
 var auth = require('./routes/auth')
@@ -15,13 +11,11 @@ app.use('/auth', auth)
 app.use('/load', load)
 app.use('/uninstall', uninstall)
 // Listen on Localhost:4000
-https
-  .createServer({
+https.createServer({
     // localhost https
     key: fs.readFileSync("/Users/tmac/localhost-key.pem"),
     cert: fs.readFileSync("/Users/tmac/localhost.pem"),
-  },
-  app)
+  },app)
   .listen(4000, ()=>{
     console.log('server is runing at port 4000')
   });

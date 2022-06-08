@@ -7,30 +7,17 @@ class BigCommerce {
     this.config = config;
     this.apiVersion = this.config.apiVersion || 'v2';
   }
+  // https://developer.bigcommerce.com/docs/ZG9jOjEyNDcxODE-handling-callbacks#verifying-the-signed-payload
   verify(signedRequest) {
-    if (!signedRequest) {throw new Error('The signed request is required to verify the call.');}
-    const splitRequest = signedRequest.split('.');
-    if (splitRequest.length < 2) {
-      throw new Error('The signed request will come in two parts seperated by a .(full stop). this signed request contains less than 2 parts.');
-    }
-    const signature = Buffer.from(splitRequest[1], 'base64').toString('utf8');
-    const json = Buffer.from(splitRequest[0], 'base64').toString('utf8');
-    const data = JSON.parse(json);
-    //console.log('JSON: ' + json);
-    //console.log('Signature: ' + signature);
-    const expected = crypto.createHmac('sha256', this.config.secret)
-      .update(json)
-      .digest('hex');
-    //console.log('Expected Signature: ' + expected);
-    if (expected.length !== signature.length ||
-      !crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(signature, 'utf8'))
-    ) {throw new Error('Signature is invalid');}
-    //console.log('Signature is valid');
+    const splitRequest = signedRequest.split('.'); // encoded_json_string.encoded_hmac_signature
+    const signature = Buffer.from(splitRequest[1], 'base64').toString('utf8'); // decode the encoded_hmac_signature
+    const json = Buffer.from(splitRequest[0], 'base64').toString('utf8'); //decode the encoded_json_string
+    const data = JSON.parse(json); // convert encoded_json_string to Object
+    const expected = crypto.createHmac('sha256', this.config.secret).update(json).digest('hex'); // use Crypto to create hmac with client_secret
     return data;
   }
   // POST OAUTH2 to Get Access Token
   async authorize(query) {
-    if (!query) throw new Error('The URL query paramaters are required.');
     const payload = {
       client_id: this.config.clientId,
       client_secret: this.config.secret,
@@ -58,9 +45,7 @@ class BigCommerce {
     });
   }
   async request(type, path, data) {
-    if (!this.config.accessToken || !this.config.storeHash) {
-      throw new Error('Access Token & Store Hash are required to call the BigCommerce API');
-    }
+    if (!this.config.accessToken || !this.config.storeHash) {throw new Error('Access Token & Store Hash are required to call the BigCommerce API');}
     const extension = this.config.responseType === 'xml' ? '.xml' : '';
     const version = this.apiVersion;
     const request = this.createAPIRequest();

@@ -46,7 +46,7 @@ class Request {
     return new Promise((resolve, reject) => {
       const req = https.request(options, res => {
         //console.log('Status Returned: ' + res.statusCode);
-        console.log('Headers Returned: ' + JSON.stringify(res.headers));
+        //console.log('Headers Returned: ' + JSON.stringify(res.headers));
         const contentEncoding = res.headers['content-encoding'];
         const shouldUnzip = ['deflate', 'gzip'].indexOf(contentEncoding) !== -1;
         const encoding = shouldUnzip ? 'binary' : 'utf8';
@@ -63,21 +63,16 @@ class Request {
           console.log(`You have reached the rate limit for the BigCommerce API, we will retry again in ${timeToWait} seconds.`);
           return setTimeout(() => {
             console.log('Restarting request call after suggested time');
-            this.run(method, path, data)
-              .then(resolve)
-              .catch(reject);
+            this.run(method, path, data).then(resolve).catch(reject);
           }, timeToWait * 1000);
         }
         res.on('data', chunk => body += chunk);
         res.on('end', () => {
-          console.log('Request complete');
           if (res.statusCode >= 400 && res.statusCode <= 600) {
             if (shouldUnzip) {
               const unzip = contentEncoding === 'deflate' ? zlib.deflate : zlib.gunzip;
               return unzip(Buffer.from(body, encoding), (err, data) => {
-                if (err) {
-                  return reject(err);
-                }
+                if (err) {return reject(err);}
                 const error = new Error(`Request returned error code: ${res.statusCode} and body: ${data.toString('utf8')}`);
                 error.code = res.statusCode;
                 error.responseBody = data.toString('utf8');

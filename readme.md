@@ -10,7 +10,7 @@ yarn install
 To host locally with NGROK:
 
 ```
-ngrok https 4000
+ngrok http https://localhost:4000
 ```
 
 ## Setup
