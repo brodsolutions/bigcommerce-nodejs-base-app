@@ -16,7 +16,5 @@ https.createServer({
     key: fs.readFileSync("/Users/tmac/localhost-key.pem"),
     cert: fs.readFileSync("/Users/tmac/localhost.pem"),
   },app)
-  .listen(4000, ()=>{
-    console.log('server is runing at port 4000')
-  });
+  .listen(4000, ()=>{console.log('server is runing at port 4000')});
 app.listen(3000)
